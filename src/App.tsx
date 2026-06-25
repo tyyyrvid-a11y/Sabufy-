@@ -26,6 +26,9 @@ export default function App() {
       setUser(session?.user ?? null);
       if (session?.user) syncFromSupabase();
       setIsAuthLoading(false);
+    }).catch(err => {
+      console.error('Failed to get session:', err);
+      setIsAuthLoading(false);
     });
 
     // Listen for changes on auth state (login, sign out, etc.)
@@ -112,10 +115,10 @@ export default function App() {
             <div className="flex items-center justify-between w-full p-2 bg-white/5 rounded-2xl">
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="w-10 h-10 rounded-full bg-m3-primary flex items-center justify-center text-m3-on-primary font-bold flex-shrink-0">
-                  {user.email?.charAt(0).toUpperCase()}
+                  {(user?.email?.[0] || 'U').toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-m3-on-surface truncate">{user.email}</p>
+                  <p className="text-[13px] font-semibold text-m3-on-surface truncate">{user?.email || 'User'}</p>
                 </div>
               </div>
               <button 
@@ -164,7 +167,7 @@ export default function App() {
                 }}
                 className="w-8 h-8 rounded-full bg-m3-primary flex items-center justify-center text-m3-on-primary font-bold"
               >
-                {user.email?.charAt(0).toUpperCase()}
+                {(user?.email?.[0] || 'U').toUpperCase()}
               </button>
             ) : (
               <button 
