@@ -18,18 +18,21 @@ import { useEffect } from 'react';
 export default function App() {
   const { currentView, setCurrentView, userPlaylists, user, setUser, syncFromSupabase } = usePlayerStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) syncFromSupabase();
+      setIsAuthLoading(false);
     });
 
     // Listen for changes on auth state (login, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) syncFromSupabase();
+      setIsAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -101,7 +104,11 @@ export default function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/5">
-          {user ? (
+          {isAuthLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="w-5 h-5 border-2 border-m3-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : user ? (
             <div className="flex items-center justify-between w-full p-2 bg-white/5 rounded-2xl">
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="w-10 h-10 rounded-full bg-m3-primary flex items-center justify-center text-m3-on-primary font-bold flex-shrink-0">
@@ -145,7 +152,11 @@ export default function App() {
             <span className="font-bold text-xl tracking-tight text-white">Sabufy</span>
           </div>
           <div>
-            {user ? (
+            {isAuthLoading ? (
+              <div className="p-2 w-9 h-9 flex items-center justify-center">
+                <div className="w-4 h-4 border-2 border-m3-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : user ? (
               <button 
                 onClick={async () => {
                   await supabase.auth.signOut();
