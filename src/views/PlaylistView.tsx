@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePlayerStore, Track, Playlist } from '../store/playerStore';
-import { getAlbumDetailsItunes } from '../lib/api';
+import { getAlbumDetailsItunes, getPlaylistDetails } from '../lib/api';
 import { Play, Loader2, Plus, Check } from 'lucide-react';
 import { formatDuration } from '../lib/utils';
 
@@ -11,7 +11,10 @@ export default function PlaylistView({ id }: { id: string }) {
 
   useEffect(() => {
     setLoading(true);
-    getAlbumDetailsItunes(id)
+    const isItunesId = /^\d+$/.test(id);
+    const fetchDetails = isItunesId ? getAlbumDetailsItunes(id) : getPlaylistDetails(id);
+    
+    fetchDetails
       .then(data => {
         setPlaylist(data);
         setLoading(false);

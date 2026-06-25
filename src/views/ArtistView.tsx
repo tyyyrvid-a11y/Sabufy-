@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePlayerStore, Track } from '../store/playerStore';
-import { getArtistDetailsItunes } from '../lib/api';
+import { getArtistDetailsItunes, getArtistDetails } from '../lib/api';
 import { Play, Loader2, Plus, Check } from 'lucide-react';
 import { formatDuration } from '../lib/utils';
 
@@ -11,7 +11,10 @@ export default function ArtistView({ id }: { id: string }) {
 
   useEffect(() => {
     setLoading(true);
-    getArtistDetailsItunes(id)
+    const isItunesId = /^\d+$/.test(id);
+    const fetchDetails = isItunesId ? getArtistDetailsItunes(id) : getArtistDetails(id);
+    
+    fetchDetails
       .then(data => {
         setArtist(data);
         setLoading(false);
