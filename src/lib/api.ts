@@ -245,12 +245,32 @@ export async function getArtistDetails(artistId: string) {
 // iTunes API Catalog Functions
 // ==========================================
 
+function fetchJsonp(url: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'itunes_jsonp_' + Math.round(1000000 * Math.random());
+    const script = document.createElement('script');
+    
+    (window as any)[callbackName] = (data: any) => {
+      delete (window as any)[callbackName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+    script.onerror = () => {
+      delete (window as any)[callbackName];
+      document.body.removeChild(script);
+      reject(new Error('JSONP Request failed'));
+    };
+    
+    document.body.appendChild(script);
+  });
+}
+
 export async function searchTracksItunes(query: string): Promise<Track[]> {
   try {
     const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=25`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
-    if (!res.ok) throw new Error('iTunes Search failed');
-    const data = await res.json();
+    const data = await fetchJsonp(itunesUrl);
     
     return data.results.map((item: any) => ({
       id: item.trackId.toString(),
@@ -268,9 +288,7 @@ export async function searchTracksItunes(query: string): Promise<Track[]> {
 export async function searchAlbumsItunes(query: string) {
   try {
     const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=20`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
-    if (!res.ok) throw new Error('iTunes Search failed');
-    const data = await res.json();
+    const data = await fetchJsonp(itunesUrl);
     
     return data.results.map((item: any) => ({
       id: item.collectionId.toString(),
@@ -288,9 +306,7 @@ export async function searchAlbumsItunes(query: string) {
 export async function searchArtistsItunes(query: string) {
   try {
     const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=15`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
-    if (!res.ok) throw new Error('iTunes Search failed');
-    const data = await res.json();
+    const data = await fetchJsonp(itunesUrl);
     
     return data.results.map((item: any) => ({
       id: item.artistId.toString(),
@@ -306,9 +322,7 @@ export async function searchArtistsItunes(query: string) {
 export async function getAlbumDetailsItunes(albumId: string) {
   try {
     const itunesUrl = `https://itunes.apple.com/lookup?id=${albumId}&entity=song`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
-    if (!res.ok) throw new Error('iTunes Lookup failed');
-    const data = await res.json();
+    const data = await fetchJsonp(itunesUrl);
     
     if (data.results.length === 0) throw new Error('Album not found');
     
@@ -340,9 +354,7 @@ export async function getAlbumDetailsItunes(albumId: string) {
 export async function getArtistDetailsItunes(artistId: string) {
   try {
     const itunesUrl = `https://itunes.apple.com/lookup?id=${artistId}&entity=song&limit=20`;
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
-    if (!res.ok) throw new Error('iTunes Lookup failed');
-    const data = await res.json();
+    const data = await fetchJsonp(itunesUrl);
     
     if (data.results.length === 0) throw new Error('Artist not found');
     
