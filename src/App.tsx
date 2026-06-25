@@ -29,6 +29,7 @@ export default function App() {
     // Listen for changes on auth state (login, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) syncFromSupabase();
     });
 
     return () => subscription.unsubscribe();
