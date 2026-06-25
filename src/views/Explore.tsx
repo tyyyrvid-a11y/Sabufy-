@@ -68,6 +68,13 @@ export default function Explore() {
         const query = latestSong ? `${latestSong.data.artist} music` : 'pop hits';
         
         const response = await fetch(`/api/yt-search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Proxy failed');
+        
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new TypeError("Response not JSON");
+        }
+        
         const data = await response.json();
         
         if (data && data.length > 0) {

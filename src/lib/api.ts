@@ -76,8 +76,11 @@ export async function getAudioStreamUrl(trackOrVideoId: Track | string): Promise
     try {
       const res = await fetch(`/api/yt-search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
-        const data = await res.json();
-        if (data.videoId) return `youtube:${data.videoId}`;
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await res.json();
+          if (data.videoId) return `youtube:${data.videoId}`;
+        }
       }
     } catch (e) {
       console.error('YouTube search proxy failed:', e);
@@ -244,7 +247,8 @@ export async function getArtistDetails(artistId: string) {
 
 export async function searchTracksItunes(query: string): Promise<Track[]> {
   try {
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=25`);
+    const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=25`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
     if (!res.ok) throw new Error('iTunes Search failed');
     const data = await res.json();
     
@@ -263,7 +267,8 @@ export async function searchTracksItunes(query: string): Promise<Track[]> {
 
 export async function searchAlbumsItunes(query: string) {
   try {
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=20`);
+    const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=20`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
     if (!res.ok) throw new Error('iTunes Search failed');
     const data = await res.json();
     
@@ -282,7 +287,8 @@ export async function searchAlbumsItunes(query: string) {
 
 export async function searchArtistsItunes(query: string) {
   try {
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=15`);
+    const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=15`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
     if (!res.ok) throw new Error('iTunes Search failed');
     const data = await res.json();
     
@@ -299,7 +305,8 @@ export async function searchArtistsItunes(query: string) {
 
 export async function getAlbumDetailsItunes(albumId: string) {
   try {
-    const res = await fetch(`https://itunes.apple.com/lookup?id=${albumId}&entity=song`);
+    const itunesUrl = `https://itunes.apple.com/lookup?id=${albumId}&entity=song`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
     if (!res.ok) throw new Error('iTunes Lookup failed');
     const data = await res.json();
     
@@ -332,7 +339,8 @@ export async function getAlbumDetailsItunes(albumId: string) {
 
 export async function getArtistDetailsItunes(artistId: string) {
   try {
-    const res = await fetch(`https://itunes.apple.com/lookup?id=${artistId}&entity=song&limit=20`);
+    const itunesUrl = `https://itunes.apple.com/lookup?id=${artistId}&entity=song&limit=20`;
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`);
     if (!res.ok) throw new Error('iTunes Lookup failed');
     const data = await res.json();
     
