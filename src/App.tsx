@@ -44,7 +44,7 @@ export default function App() {
     <div className="flex h-screen bg-m3-surface text-m3-on-surface font-sans overflow-hidden selection:bg-m3-primary/30 relative">
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-m3-surface-container p-6 h-full border-r border-white/5 relative z-10">
+      <aside className="hidden md:flex flex-col w-64 bg-m3-surface-container p-6 pb-32 h-full border-r border-white/5 relative z-10">
         <div className="flex items-center gap-2 mb-10 mt-2 pl-2">
           <div className="w-8 h-8 rounded-full flex items-center justify-center bg-m3-primary">
             <Music className="w-5 h-5 text-m3-on-primary" />
